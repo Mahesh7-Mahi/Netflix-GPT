@@ -12,6 +12,9 @@
 - create signup user account
 - implemente signin user api
 - created redux store with userSlice
+- firebase initiated
+- sign out
+- Update User
 
 1. useRef() -> is used to reference to field, input, button etc
 

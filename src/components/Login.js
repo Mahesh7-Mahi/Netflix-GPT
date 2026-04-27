@@ -1,99 +1,33 @@
 import React, { useRef, useState } from "react";
 import Header from "./Header";
 import { checkValidateData } from "../utils/validate.js";
-import { useDispatch } from "react-redux";
-import { addUser } from "../utils/userSlice.js";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../utils/firebase.js";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice.js";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
-  const mobile = useRef(null);
 
   const toggleSignInForm = () => {
     setErrorMessage(null);
     setIsSignInForm(!isSignInForm);
   };
 
-  const fetchLoginApiResp = async (loginApiRequestBody) => {
-    const auth = getAuth();
-createUserWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
-    // Signed up 
-    const user = userCredential.user;
-    // ...
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // ..
-  });
-    // try {
-    //   const response = await fetch("/auth/login", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(loginApiRequestBody),
-    //   });
-
-    //   if (!response.ok) {
-    //     throw new Error("Login failed");
-    //   }
-
-    //   const data = await response.json();
-    //   console.log(data);
-    //   dispatch(
-    //     addUser({
-    //       token: data.data.token,
-    //       email: data.data.userData.email,
-    //       displayName: data.data.userData.name,
-    //     }),
-    //   );
-    //   navigate("/browse");
-    // } catch (error) {
-    //   console.error("Error:", error);
-    // }
-  };
-
-  const fetchSignUpApiResp = async (loginApiRequestBody) => {
-    try {
-      const response = await fetch("/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginApiRequestBody),
-      });
-      if (!response.ok) {
-        throw new Error("SignUp failed");
-      }
-      const data = await response.json();
-      console.log(data);
-      dispatch(
-        addUser({
-          email: data.data.userData.email,
-          displayName: data.data.userData.name,
-        }),
-      );
-      navigate("/browse");
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
   const handleButtonClick = () => {
     const message = checkValidateData(
       email.current.value,
       password.current.value,
-      isSignInForm ? null : mobile.current.value,
       isSignInForm ? null : name.current?.value,
     );
 
@@ -101,22 +35,51 @@ createUserWithEmailAndPassword(auth, email, password)
 
     if (message) return;
 
-    const loginApiRequestBody = {};
-
-    console.log(isSignInForm);
-
-    if (isSignInForm) {
-      loginApiRequestBody["email"] = email.current.value;
-      loginApiRequestBody["password"] = password.current.value;
-      fetchLoginApiResp(loginApiRequestBody);
-      console.log(loginApiRequestBody);
+    if (!isSignInForm) {
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value,
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name.current.value,
+            photoURL: "https://example.com/jane-q-user/profile.jpg",
+          })
+            .then(() => {
+              const { uid, email, displayName } = auth.currentUser;
+              dispatch(
+                addUser({ uid: uid, email: email, displayName: displayName }),
+              );
+              navigate("/browse");
+            })
+            .catch((error) => {
+              setErrorMessage(error.message);
+            });
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
     } else {
-      loginApiRequestBody["email"] = email.current.value;
-      loginApiRequestBody["password"] = password.current.value;
-      loginApiRequestBody["mobile"] = mobile.current.value;
-      loginApiRequestBody["name"] = name.current.value;
-      fetchSignUpApiResp(loginApiRequestBody);
-      console.log(loginApiRequestBody);
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value,
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+          navigate("/browse");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
     }
   };
 
@@ -144,18 +107,11 @@ createUserWithEmailAndPassword(auth, email, password)
             className="p-4 mt-6 w-full border-gray-600 border bg-black bg-opacity-60 text-white rounded-md font-semibold"
           />
         )}
-        {!isSignInForm && (
-          <input
-            ref={mobile}
-            type="text"
-            placeholder="Mobile"
-            className="p-4 mt-6 w-full border-gray-600 border bg-black bg-opacity-60 text-white rounded-md font-semibold"
-          />
-        )}
+
         <input
           ref={email}
           type="text"
-          placeholder="Email"
+          placeholder="Email or mobile number"
           className="p-4 mt-6 w-full border-gray-600 border bg-black bg-opacity-60 text-white rounded-md font-semibold"
         />
 
