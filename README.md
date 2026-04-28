@@ -15,6 +15,17 @@
 - firebase initiated
 - sign out
 - Update User
+- BugFix: if the user is not logged in Redirect /browse to login page and vice-versa
+- Unsubscribed to the onAuthStateChanged callback
+- Add hardcoded value to the constant file
+- Get data from TMDB
+- Browse page
+  - Main Container
+    - VideoBackground
+    - VideoTitle
+  - Secondary Container
+    - MovieList x n
+      - cards x n
 
 1. useRef() -> is used to reference to field, input, button etc
 
