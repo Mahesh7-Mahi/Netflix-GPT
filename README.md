@@ -26,6 +26,23 @@
   - Secondary Container
     - MovieList x n
       - cards x n
+- Custom hooks for Now playing movie
+- Create movie slice
+- update store with movie data
+- Planning for main container & scondaryContainer
+- fetch data for trailer video
+- update store with trailer VIDEO data
+- Embadded the youtube video and make it autoplay and mute
+- tailwind classes to make mainContainer look awesome
+- Build Secondary component
+  - MovieList of popular
+    - Movie Cards x n
+  - MovieList of Now Playing
+  - MovieList of Trending
+  - MovieList of Horred
+  - TMDB Image CDN URL
+- Made the browse page with tailwind css
+- usePopularMovies Custom hook
 
 1. useRef() -> is used to reference to field, input, button etc
 
@@ -40,7 +57,7 @@
     - Trailer in Background
     - Title & Description
     - MovieSuggestion
-      - MovieLists \* N
+      - MovieLists x N
 
 - NetflixGPT
   - Search Bar
