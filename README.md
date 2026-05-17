@@ -43,6 +43,10 @@
   - TMDB Image CDN URL
 - Made the browse page with tailwind css
 - usePopularMovies Custom hook
+- GPT Search feature
+- GPT Search bar
+- Multi-language Feature in our App
+- integrate the GPT APIs(get our key)
 
 1. useRef() -> is used to reference to field, input, button etc
 

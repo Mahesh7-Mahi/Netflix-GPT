@@ -14,7 +14,6 @@ const useUpcoming = () => {
 
     const jsonData = await response.json();
     dispatch(upComing(jsonData.results));
-    console.log(jsonData?.results);
   };
 
   useEffect(() => {
